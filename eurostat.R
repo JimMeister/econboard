@@ -1,6 +1,7 @@
-get.dsd <- function(flowref)
-  readSDMX(paste0("http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_", flowref))
+# Uses ISO 3166-1 alpha-2 country codes
 
+eurostat.get.dsd <- function(flowref)
+  readSDMX(paste0("http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_", flowref))
 
 eurostat.query <- function(flowref, keys, startPeriod, endPeriod)
   {
