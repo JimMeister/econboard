@@ -1,4 +1,5 @@
-# Uses ISO 3166-1 alpha-2 country codes
+### Uses codes close but not identical to ISO 3166-1 alpha-2 country codes
+### UK instead of GB, EL instead of GR
 
 eurostat.get.dsd <- function(flowref)
   readSDMX(paste0("http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_", flowref))

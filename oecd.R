@@ -6,37 +6,44 @@ oecd.get.dsd <- function(flowref)
 oecd.query <- function(flowref, keys, startPeriod, endPeriod)
   {
     if (is.null(keys[["FREQUENCY"]]))
-      stop("No frequency set")
+      {
+        if (is.null(keys[["FREQ"]]))
+          stop("No frequency set")
+        else
+          frq <- keys$FREQ
+      }
+    else
+      frq <- keys$FREQUENCY
     
-    if (keys$FREQUENCY == "A")
+    if (frq == "A")
       {
         freq <- 1
         sp <- startPeriod
         ep <- endPeriod
       }
-    else if (keys$FREQUENCY == "Q")
+    else if (frq == "Q")
       {
         freq <- 4
         sp <- sprintf("%d-Q%d", startPeriod[1], startPeriod[2])
         ep <- sprintf("%d-Q%d", endPeriod[1], endPeriod[2])
       }
-    else if (keys$FREQUENCY == "M")
+    else if (frq == "M")
       {
         freq <- 12
         sp <- sprintf("%d-%d-01", startPeriod[1], startPeriod[2])
         ep <- sprintf("%d-%d-01", endPeriod[1], endPeriod[2])
       }
     else
-      stop("Unknown frequency: ", keys$FREQUENCY)
+      stop("Unknown frequency:", frq)
 
     ## Construct query, taking into account ANDs (.) and ORs (+)
     key <- paste(lapply(keys, function(y) paste(y, collapse="+")), collapse = ".")
     url <- paste0("http://stats.oecd.org/restsdmx/sdmx.ashx/GetData/", flowref,
                   "/", key, "?startTime=", sp, "&endTime=", ep)
     d <- as.data.frame(readSDMX(url), stringsAsFactors = FALSE)
-    print(d)
 
     ## Extract series for each combination of keys
+    ## TODO: handle missing values (they are not returned by the OECD in the dataframe)
     cartesian.product <- expand.grid(keys, stringsAsFactors = FALSE)
     result <- list()
     for (i in 1:nrow(cartesian.product))
