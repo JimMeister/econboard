@@ -1,0 +1,9 @@
+Package: econboard
+Title: Macroeconomic analysis
+Version: 0.0.0.9000
+Authors@R: "Sébastien Villemot <sebastien@debian.org> [aut,cre,cph]"
+Description: Fetch macroeconomic data, perform time series analysis and forecasting.
+Depends: R (>= 3.1)
+Imports: rsdmx
+License: GPL (>= 3)
+LazyData: true

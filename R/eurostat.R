@@ -2,7 +2,7 @@
 ### UK instead of GB, EL instead of GR
 
 eurostat.get.dsd <- function(flowref)
-  readSDMX(paste0("http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_", flowref))
+  rsdmx::readSDMX(paste0("http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_", flowref))
 
 eurostat.query <- function(flowref, keys, startPeriod, endPeriod)
   {
@@ -37,7 +37,7 @@ eurostat.query <- function(flowref, keys, startPeriod, endPeriod)
     key <- paste(lapply(keys, function(y) paste(y, collapse="+")), collapse = ".")
     url <- paste0("http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/", flowref,
                   "/", key, "?startPeriod=", sp, "&endPeriod=", ep)
-    d <- as.data.frame(readSDMX(url), stringsAsFactors = FALSE)
+    d <- as.data.frame(rsdmx::readSDMX(url), stringsAsFactors = FALSE)
 
     ## Extract series for each combination of keys
     cartesian.product <- expand.grid(keys, stringsAsFactors = FALSE)

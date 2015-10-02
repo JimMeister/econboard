@@ -3,7 +3,7 @@
 oecd.countries <- c("AUS", "AUT", "BEL", "CAN", "CHL", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL", "IRL", "ISR", "ITA", "JPN", "KOR", "LUX", "MEX", "NLD", "NZL", "NOR", "POL", "PRT", "SVK", "SVN", "ESP", "SWE", "CHE", "TUR", "GBR", "USA")
 
 oecd.get.dsd <- function(flowref)
-  readSDMX(paste0("http://stats.oecd.org/restsdmx/sdmx.ashx/GetDataStructure/", flowref))
+  rsdmx::readSDMX(paste0("http://stats.oecd.org/restsdmx/sdmx.ashx/GetDataStructure/", flowref))
 
 oecd.query <- function(flowref, keys, startPeriod, endPeriod, simplify.names = TRUE)
   {
@@ -36,7 +36,7 @@ oecd.query <- function(flowref, keys, startPeriod, endPeriod, simplify.names = T
     key <- paste(lapply(keys, function(y) paste(y, collapse="+")), collapse = ".")
     url <- paste0("http://stats.oecd.org/restsdmx/sdmx.ashx/GetData/", flowref,
                   "/", key, "?startTime=", sp, "&endTime=", ep)
-    d <- as.data.frame(readSDMX(url), stringsAsFactors = FALSE)
+    d <- as.data.frame(rsdmx::readSDMX(url), stringsAsFactors = FALSE)
     
     ## Extract series for each combination of keys
     cartesian.product <- expand.grid(keys, stringsAsFactors = FALSE)
