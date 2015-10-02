@@ -14,18 +14,21 @@ eurostat.query <- function(flowref, keys, startPeriod, endPeriod)
         freq <- 1
         sp <- startPeriod
         ep <- endPeriod
+        parse.date <- function(x) as.numeric(x)
       }
     else if (keys$FREQ == "Q")
       {
         freq <- 4
         sp <- sprintf("%d-Q%d", startPeriod[1], startPeriod[2])
         ep <- sprintf("%d-Q%d", endPeriod[1], endPeriod[2])
+        parse.date <- function(x) as.numeric(unlist(strsplit(x, "-Q")))
       }
     else if (keys$FREQ == "M")
       {
         freq <- 12
         sp <- sprintf("%d-%d-01", startPeriod[1], startPeriod[2])
         ep <- sprintf("%d-%d-01", endPeriod[1], endPeriod[2])
+        parse.date <- function(x) as.numeric(unlist(strsplit(x, "-")))[1:2]
       }
     else
       stop("Unknown frequency: ", keys$FREQ)
@@ -45,34 +48,42 @@ eurostat.query <- function(flowref, keys, startPeriod, endPeriod)
         for (j in names(cartesian.product))
           idx <- idx & (d[[j]] == cartesian.product[[j]][i])
 
-        obsTime <- d$obsTime[idx]
-        stopifnot(obsTime[1] == ep && obsTime[length(obsTime)] == sp)
-        result[[paste(cartesian.product[i,], collapse = ".")]] <- rev(d$obsValue[idx])
+        if (any(idx))
+          {
+            obsTime <- d$obsTime[idx]
+            result[[paste(cartesian.product[i,], collapse = ".")]] <- ts(rev(d$obsValue[idx]), start = parse.date(obsTime[length(obsTime)]), end = parse.date(obsTime[1]), frequency = freq)
+          }
+        else
+          result[[paste(cartesian.product[i,], collapse = ".")]] <- ts(NA, start = startPeriod, end = endPeriod)
       }
 
-    ts(as.data.frame(result), start = startPeriod, end = endPeriod, frequency = freq)
+    do.call("ts.union", result)
   }
 
-growth <- function(countries, startPeriod, endPeriod, freq = 1)
+eurostat.growth <- function(countries, startPeriod, endPeriod, freq = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "CLV_PCH_PRE",
+                                     NA_ITEM = "B1GQ", GEO = countries),
+                 startPeriod, endPeriod)
+
+eurostat.unemployment <- function(countries, startPeriod, endPeriod, freq = 1)
+  eurostat.query("une_rt_a", list(FREQ = "A", S_ADJ = "NSA",
+                                  AGE = "TOTAL", SEX = "T", GEO = countries),
+                 startPeriod, endPeriod)
+
+eurostat.inflation <- function(countries, startPeriod, endPeriod, freq = 1)
+  eurostat.query("prc_hicp_aind", list(FREQ = "A", UNIT = "RCH_A_AVG",
+                                       COICOP = "CP00", GEO = countries),
+                 startPeriod, endPeriod)
+
+list.codes <- function(dsd)
   {
-    eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "CLV_PCH_PRE",
-                                       NA_ITEM = "B1GQ", GEO = countries),
-                   startPeriod, endPeriod)
+    l <- dsd@codelists@codelists
+    for (x in l)
+      {
+        cat(x@id, " (", x@Name$en, ")", fill = TRUE, sep = "")
+        for (y in x@Code)
+          {
+            cat("- ", y@id, " (", y@label$en, ")", fill = TRUE, sep = "")
+          }
+      }
   }
-
-unemployment <- function(countries, startPeriod, endPeriod, freq = 1)
-  {
-    eurostat.query("une_rt_a", list(FREQ = "A", S_ADJ = "NSA",
-                                    AGE = "TOTAL", SEX = "T", GEO = countries),
-                   startPeriod, endPeriod)
-  }
-
-
-inflation <- function(countries, startPeriod, endPeriod, freq = 1)
-  {
-    eurostat.query("prc_hicp_aind", list(FREQ = "A", UNIT = "RCH_A_AVG",
-                                         COICOP = "CP00", GEO = countries),
-                   startPeriod, endPeriod)
-  }
-
-

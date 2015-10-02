@@ -1,14 +1,22 @@
 # Uses ISO 3166-1 alpha-3 country codes
 
+oecd.countries <- c("AUS", "AUT", "BEL", "CAN", "CHL", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL", "IRL", "ISR", "ITA", "JPN", "KOR", "LUX", "MEX", "NLD", "NZL", "NOR", "POL", "PRT", "SVK", "SVN", "ESP", "SWE", "CHE", "TUR", "GBR", "USA")
+
 oecd.get.dsd <- function(flowref)
   readSDMX(paste0("http://stats.oecd.org/restsdmx/sdmx.ashx/GetDataStructure/", flowref))
 
-oecd.query <- function(flowref, keys, startPeriod, endPeriod)
+oecd.query <- function(flowref, keys, startPeriod, endPeriod, simplify.names = TRUE)
   {
     if (is.null(keys[["FREQUENCY"]]))
       {
         if (is.null(keys[["FREQ"]]))
-          stop("No frequency set")
+          {
+            ## No frequency set, guessing using dates format
+            if (length(startPeriod) == 1)
+              frq <- "A"
+            else
+              stop("Frequency not yet implemented")
+          }
         else
           frq <- keys$FREQ
       }
@@ -21,47 +29,50 @@ oecd.query <- function(flowref, keys, startPeriod, endPeriod)
         sp <- startPeriod
         ep <- endPeriod
       }
-    else if (frq == "Q")
-      {
-        freq <- 4
-        sp <- sprintf("%d-Q%d", startPeriod[1], startPeriod[2])
-        ep <- sprintf("%d-Q%d", endPeriod[1], endPeriod[2])
-      }
-    else if (frq == "M")
-      {
-        freq <- 12
-        sp <- sprintf("%d-%d-01", startPeriod[1], startPeriod[2])
-        ep <- sprintf("%d-%d-01", endPeriod[1], endPeriod[2])
-      }
     else
-      stop("Unknown frequency:", frq)
+      stop("Frequency not yet implemented:", frq)
 
     ## Construct query, taking into account ANDs (.) and ORs (+)
     key <- paste(lapply(keys, function(y) paste(y, collapse="+")), collapse = ".")
     url <- paste0("http://stats.oecd.org/restsdmx/sdmx.ashx/GetData/", flowref,
                   "/", key, "?startTime=", sp, "&endTime=", ep)
     d <- as.data.frame(readSDMX(url), stringsAsFactors = FALSE)
-
+    
     ## Extract series for each combination of keys
-    ## TODO: handle missing values (they are not returned by the OECD in the dataframe)
     cartesian.product <- expand.grid(keys, stringsAsFactors = FALSE)
     result <- list()
+
+    if (simplify.names && any(sapply(keys, length) > 1))
+      dim.names.idx <- which(sapply(keys, length) > 1)
+    else
+      dim.names.idx <- 1:length(keys)
+    
     for (i in 1:nrow(cartesian.product))
       {
+        series <- paste(cartesian.product[i,dim.names.idx], collapse = ".")
+        result[[series]] <- ts(NA, start = startPeriod, end = endPeriod)
+        
         idx <- rep(TRUE, nrow(d))
         for (j in names(cartesian.product))
           idx <- idx & (d[[j]] == cartesian.product[[j]][i])
 
-        obsTime <- d$obsTime[idx]
-        stopifnot(obsTime[1] == sp && obsTime[length(obsTime)] == ep)
-        result[[paste(cartesian.product[i,], collapse = ".")]] <- d$obsValue[idx]
+        for (j in which(idx))
+          window(result[[series]], start = as.numeric(d$obsTime[j]), end = as.numeric(d$obsTime[j])) <- d$obsValue[j]
       }
 
-    ts(as.data.frame(result), start = startPeriod, end = endPeriod, frequency = freq)
+    do.call("ts.union", result)
   }
 
-output.gap <- function(countries, startPeriod, endPeriod, freq = 1)
-  {
-    oecd.query("EO", list(LOCATION = countries, VARIABLE = "GAP", FREQUENCY = "A"),
-               startPeriod, endPeriod)
-  }
+oecd.output.gap <- function(countries, startPeriod, endPeriod, freq = 1)
+  oecd.query("EO", list(LOCATION = countries, VARIABLE = "GAP", FREQUENCY = "A"),
+             startPeriod, endPeriod)
+
+oecd.foreign.born.population.rate <- function(countries, startPeriod, endPeriod)
+  oecd.query("MIG", list(CO2="TOTP", VAR="B14", GEN="TOT", COU=countries), startPeriod, endPeriod)
+
+oecd.foreign.population.rate <- function(countries, startPeriod, endPeriod)
+  oecd.query("MIG", list(CO2="TOTP", VAR="B15", GEN="TOT", COU=countries), startPeriod, endPeriod)
+
+oecd.unemployment <- function(countries, startPeriod, endPeriod)
+  oecd.query("ALFS_POP_LABOUR", list(LOCATION=countries, SUBJECT="YT99UNPT_ST", SEX="TT", FREQUENCY="A"),
+             startPeriod, endPeriod)
