@@ -4,6 +4,6 @@ Version: 0.0.0.9000
 Authors@R: "Sébastien Villemot <sebastien@debian.org> [aut,cre,cph]"
 Description: Fetch macroeconomic data, perform time series analysis and forecasting.
 Depends: R (>= 3.1)
-Imports: rsdmx (>= 0.5-0)
+Imports: rsdmx (>= 0.5-0), ISOcodes
 License: GPL (>= 3)
 LazyData: true
