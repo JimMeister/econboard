@@ -1,4 +1,4 @@
-sdmx.query <- function(agencyId, operation, key, filter, startPeriod, endPeriod, frequency, simplify.names = TRUE)
+sdmx.query <- function(agencyId, operation, key, filter, startPeriod, endPeriod, frequency, simplify.names = TRUE, filter.subst = list())
   {
     ## TODO: Add consistency check between FREQ/FREQUENCY key and frequency arg
     ## Or do it in upper level functions?
@@ -24,12 +24,18 @@ sdmx.query <- function(agencyId, operation, key, filter, startPeriod, endPeriod,
     else
       stop("Unknown frequency: ", frequency)
 
+    ## Proceed with substitutions in filter names
+    filter.orig <- filter
+    for (k in names(filter.subst))
+      filter[[k]] <- filter.subst[[k]]
+
     d <- as.data.frame(rsdmx::readSDMX(agencyId = agencyId, operation = operation, key = key,
                                        filter = filter, start = sp, end = ep),
                        stringsAsFactors = FALSE)
 
     ## Extract series for each combination of filter criterion
     cartesian.product <- expand.grid(filter, stringsAsFactors = FALSE)
+    cartesian.product.orig <- expand.grid(filter.orig, stringsAsFactors = FALSE) # Will be used for naming the series along the original filter names
     result <- list()
 
     if (simplify.names && any(sapply(filter, length) > 1))
@@ -39,7 +45,7 @@ sdmx.query <- function(agencyId, operation, key, filter, startPeriod, endPeriod,
 
     for (i in 1:nrow(cartesian.product))
       {
-        series <- paste(cartesian.product[i,dim.names.idx], collapse = ".")
+        series <- paste(cartesian.product.orig[i,dim.names.idx], collapse = ".")
         result[[series]] <- ts(NA, start = startPeriod, end = endPeriod, frequency = frequency)
 
         idx <- rep(TRUE, nrow(d))

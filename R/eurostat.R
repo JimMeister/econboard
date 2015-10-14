@@ -18,11 +18,13 @@ eurostat.convert.codes <- function(countries)
 
 eurostat.query <- function(key, filter, startPeriod, endPeriod, frequency, simplify.names = TRUE)
   {
+    filter.subst <- list()
     if ("GEO" %in% names(filter))
-      filter$GEO <- eurostat.convert.codes(filter$GEO)
+      filter.subst$GEO <- eurostat.convert.codes(filter$GEO)
 
     sdmx.query(agencyId = "ESTAT", operation = "data", key = key, filter = filter,
-               startPeriod, endPeriod, frequency, simplify.names = simplify.names)
+               startPeriod, endPeriod, frequency, simplify.names = simplify.names,
+               filter.subst = filter.subst)
   }
 
 eurostat.growth <- function(countries, startPeriod, endPeriod, frequency = 1)
