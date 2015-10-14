@@ -39,3 +39,44 @@ eurostat.inflation <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("prc_hicp_aind", list(FREQ = "A", UNIT = "RCH_A_AVG",
                                        COICOP = "CP00", GEO = countries),
                  startPeriod, endPeriod, frequency)
+
+## Current account balance as percentage of GDP (BOP6)
+eurostat.ca.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
+                                    BOP_ITEM = "CA", STK_FLOW = "BAL", PARTNER = "WRL_REST",
+                                    GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+## Net international investment position as percentage of GDP (BOP6)
+eurostat.niip.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
+                                    BOP_ITEM = "FA", STK_FLOW = "N_LE", PARTNER = "WRL_REST",
+                                    GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+### Breakdown of GDP
+
+## Exports to GDP ratio
+eurostat.exports.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "PC_GDP", NA_ITEM = "P6",
+                                     GEO = countries), startPeriod, endPeriod, frequency)
+
+## Imports to GDP ratio
+eurostat.imports.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "PC_GDP", NA_ITEM = "P7",
+                                     GEO = countries), startPeriod, endPeriod, frequency)
+
+## Final consumption expenditure to GDP ratio
+eurostat.consumption.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "PC_GDP", NA_ITEM = "P3",
+                                     GEO = countries), startPeriod, endPeriod, frequency)
+
+## Gross fixed capital formation to GDP ratio
+eurostat.investment.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "PC_GDP", NA_ITEM = "P51G",
+                                     GEO = countries), startPeriod, endPeriod, frequency)
+
+## Changes in inventories and acquisitions less disposals of valuables (in ratio of GDP)
+eurostat.delta.stock.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "PC_GDP", NA_ITEM = "P52_P53",
+                                     GEO = countries), startPeriod, endPeriod, frequency)
