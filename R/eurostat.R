@@ -32,6 +32,12 @@ eurostat.growth <- function(countries, startPeriod, endPeriod, frequency = 1)
                                      NA_ITEM = "B1GQ", GEO = countries),
                  startPeriod, endPeriod, frequency)
 
+## Nominal GDP in euros
+eurostat.nominal.gdp.euro <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "CP_MEUR",
+                                     NA_ITEM = "B1G", GEO = countries),
+                 startPeriod, endPeriod, frequency) * 1e6
+
 eurostat.unemployment <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("une_rt_a", list(FREQ = "A", S_ADJ = "NSA",
                                   AGE = "TOTAL", SEX = "T", GEO = countries),
