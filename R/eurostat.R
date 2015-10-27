@@ -62,6 +62,21 @@ eurostat.niip.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
                                     GEO = countries),
                  startPeriod, endPeriod, frequency)
 
+## Exports to GDP ratio (according to balance of payments)
+eurostat.exports.gdp.bop <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
+                                    BOP_ITEM = "GS", STK_FLOW = "CRE", PARTNER = "WRL_REST",
+                                    GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+## Imports to GDP ratio (according to balance of payments)
+eurostat.imports.gdp.bop <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
+                                    BOP_ITEM = "GS", STK_FLOW = "DEB", PARTNER = "WRL_REST",
+                                    GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+
 ### Breakdown of GDP
 
 ## Exports to GDP ratio
