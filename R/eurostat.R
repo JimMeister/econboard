@@ -48,6 +48,11 @@ eurostat.inflation <- function(countries, startPeriod, endPeriod, frequency = 1)
                                        COICOP = "CP00", GEO = countries),
                  startPeriod, endPeriod, frequency)
 
+eurostat.inflation.gdp.deflator <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "PD_PCH_PRE_EUR",
+                                     NA_ITEM = "B1GQ", GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
 ## Current account balance as percentage of GDP (BOP6)
 eurostat.ca.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
@@ -74,6 +79,11 @@ eurostat.imports.gdp.bop <- function(countries, startPeriod, endPeriod, frequenc
   eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
                                     BOP_ITEM = "GS", STK_FLOW = "DEB", PARTNER = "WRL_REST",
                                     GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+eurostat.debt.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("gov_10dd_edpt1", list(FREQ="A", UNIT="PC_GDP", SECTOR="S13",
+                                        NA_ITEM="GD", GEO=country),
                  startPeriod, endPeriod, frequency)
 
 
