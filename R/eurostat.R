@@ -28,15 +28,42 @@ eurostat.query <- function(key, filter, startPeriod, endPeriod, frequency, simpl
   }
 
 eurostat.growth <- function(countries, startPeriod, endPeriod, frequency = 1)
-  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "CLV_PCH_PRE",
-                                     NA_ITEM = "B1GQ", GEO = countries),
-                 startPeriod, endPeriod, frequency)
+  {
+    if (frequency == 1)
+      {
+        eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "CLV_PCH_PRE",
+                                           NA_ITEM = "B1GQ", GEO = countries),
+                       startPeriod, endPeriod, frequency)
+      }
+    else if (frequency == 4)
+      {
+        eurostat.query("namq_10_gdp", list(FREQ = "Q", UNIT = "CLV_PCH_PRE", S_ADJ = "SWDA",
+                                           NA_ITEM = "B1GQ", GEO = countries),
+                       startPeriod, endPeriod, frequency)
+      }
+    else
+      stop("Unsupported frequency")
+  }
+
 
 ## Nominal GDP in euros
 eurostat.nominal.gdp.euro <- function(countries, startPeriod, endPeriod, frequency = 1)
-  eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "CP_MEUR",
-                                     NA_ITEM = "B1GQ", GEO = countries),
-                 startPeriod, endPeriod, frequency) * 1e6
+  {
+    if (frequency == 1)
+      {
+        eurostat.query("nama_10_gdp", list(FREQ = "A", UNIT = "CP_MEUR",
+                                           NA_ITEM = "B1GQ", GEO = countries),
+                       startPeriod, endPeriod, frequency) * 1e6
+      }
+    else if (frequency == 4)
+      {
+        eurostat.query("namq_10_gdp", list(FREQ = "Q", UNIT = "CP_MEUR", S_ADJ = "NSA",
+                                           NA_ITEM = "B1GQ", GEO = countries),
+                       startPeriod, endPeriod, frequency) * 1e6
+      }
+    else
+      stop("Unsupported frequency")
+  }
 
 eurostat.unemployment <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("une_rt_a", list(FREQ = "A", S_ADJ = "NSA",
