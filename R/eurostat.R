@@ -53,33 +53,64 @@ eurostat.inflation.gdp.deflator <- function(countries, startPeriod, endPeriod, f
                                      NA_ITEM = "B1GQ", GEO = countries),
                  startPeriod, endPeriod, frequency)
 
-## Current account balance as percentage of GDP (BOP6)
+### Balance of payments (BPM6)
+## Current account balance as percentage of GDP (BPM6)
 eurostat.ca.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
                                     BOP_ITEM = "CA", STK_FLOW = "BAL", PARTNER = "WRL_REST",
                                     GEO = countries),
                  startPeriod, endPeriod, frequency)
 
-## Net international investment position as percentage of GDP (BOP6)
+## Net international investment position as percentage of GDP (BPM6)
 eurostat.niip.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
                                     BOP_ITEM = "FA", STK_FLOW = "N_LE", PARTNER = "WRL_REST",
                                     GEO = countries),
                  startPeriod, endPeriod, frequency)
 
-## Exports to GDP ratio (according to balance of payments)
+## Exports to GDP ratio (according to balance of payments) (BPM6)
 eurostat.exports.gdp.bop <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
                                     BOP_ITEM = "GS", STK_FLOW = "CRE", PARTNER = "WRL_REST",
                                     GEO = countries),
                  startPeriod, endPeriod, frequency)
 
-## Imports to GDP ratio (according to balance of payments)
+## Imports to GDP ratio (according to balance of payments) (BPM6)
 eurostat.imports.gdp.bop <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("bop_gdp6_q", list(FREQ = "A", UNIT = "PC_GDP", S_ADJ = "NSA",
                                     BOP_ITEM = "GS", STK_FLOW = "DEB", PARTNER = "WRL_REST",
                                     GEO = countries),
                  startPeriod, endPeriod, frequency)
+
+### Balance of payments (BPM5)
+## Current account balance as percentage of GDP (BPM5)
+eurostat.ca.gdp.bpm5 <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_q_gdp", list(FREQ = "A", UNIT = "PC_GDP", POST = "993",
+                                   STK_FLOW = "NET", PARTNER = "WORLD",
+                                   GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+## Net international investment position as percentage of GDP (BPM5)
+eurostat.niip.gdp.bpm5 <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_q_gdp", list(FREQ = "A", UNIT = "PC_GDP", POST = "995",
+                                   STK_FLOW = "STK", PARTNER = "WORLD",
+                                   GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+## Exports to GDP ratio (according to balance of payments) (BPM5)
+eurostat.exports.gdp.bop.bpm5 <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_q_gdp", list(FREQ = "A", UNIT = "PC_GDP", POST = "991",
+                                   STK_FLOW = "CRE", PARTNER = "WORLD",
+                                   GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
+## Imports to GDP ratio (according to balance of payments) (BPM5)
+eurostat.imports.gdp.bop.bpm5 <- function(countries, startPeriod, endPeriod, frequency = 1)
+  eurostat.query("bop_q_gdp", list(FREQ = "A", UNIT = "PC_GDP", POST = "991",
+                                   STK_FLOW = "DEB", PARTNER = "WORLD",
+                                   GEO = countries),
+                 startPeriod, endPeriod, frequency)
+
 
 eurostat.debt.gdp <- function(countries, startPeriod, endPeriod, frequency = 1)
   eurostat.query("gov_10dd_edpt1", list(FREQ="A", UNIT="PC_GDP", SECTOR="S13",
